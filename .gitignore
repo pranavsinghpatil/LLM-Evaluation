@@ -1,1 +1,19 @@
+# Ignoring common Python build/distribution/packaging files
+.Python
+.project
+.settings
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+.coverage
+.pytest_cache/
+htmlcov/
+dist/
+build/
+# Virtual environment
+venv/
+env/
 /docs/
+*\__pycache__\

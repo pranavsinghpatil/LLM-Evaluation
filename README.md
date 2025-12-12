@@ -22,6 +22,8 @@ This pipeline is built as part of the BeyondChats internship assignment and focu
 ## 🚀 Key Features
 
 - **Modular architecture** — relevance, completeness, hallucination, and cost scoring are separate modules.
+- **Microservice-ready** — includes a FastAPI server (`src/api.py`) for real-time deployment.
+- **Advanced Hallucination Detection** — uses Spacy NER to verify entity consistency.
 - **Deterministic & interpretable scoring** — transparent formulas and thresholds.
 - **Retrieval-backed hallucination evaluation** — uses context vectors from a vector DB.
 - **Low-latency** (TF-IDF based) prototype suitable for real-time usage.

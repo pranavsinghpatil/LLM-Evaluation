@@ -1,0 +1,15 @@
+{
+  "metrics": {
+    "relevance": 0.1342,
+    "completeness": 0.5,
+    "hallucination": 0.8615,
+    "latency_ms": 94.4,
+    "estimated_cost_usd": 0.00025
+  },
+  "verdict": {
+    "status": "FAIL",
+    "reasons": [
+      "High hallucination risk"
+    ]
+  }
+}
