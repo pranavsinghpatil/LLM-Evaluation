@@ -110,7 +110,7 @@ Each module computes an independent score:
 |--------|---------|
 | Relevance | semantic similarity to user intent + context alignment |
 | Completeness | keyword + sub-question + context usage coverage |
-| Hallucination | claim extraction + context support verification |
+| Hallucination | **Claim Verification**: `unsupported_claims / total_claims`. (0.0=Perfect, >0.6=High Risk) |
 | Latency/Cost | runtime + token estimate |
 
 ### 3️⃣ Aggregation  
