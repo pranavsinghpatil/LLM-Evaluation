@@ -326,216 +326,187 @@ function App() {
             {/* Input Section */}
             <div className="space-y-6">
               <div className="bg-slate-800 p-6 rounded-xl border border-slate-700 shadow-lg">
-                {/* Header Section */}
-                <div className="flex items-center justify-between mb-8">
-                  <div>
-                    <h2 className="text-2xl font-bold text-white tracking-tight flex items-center gap-3">
+                {/* Compact Input Configuration */}
+                <div className="bg-slate-900/50 rounded-xl p-4 border border-slate-700/50 mb-6">
+                  <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    {/* Header & Toggle */}
+                    <div className="flex items-center gap-4">
                       <div className="p-2 bg-blue-500/10 rounded-lg">
-                        <MessageSquare className="w-6 h-6 text-blue-400" />
+                        <MessageSquare className="w-5 h-5 text-blue-400" />
                       </div>
-                      Input Configuration
-                    </h2>
-                    <p className="text-sm text-slate-400 mt-1 ml-1">Configure your evaluation data source.</p>
-                  </div>
+                      <div>
+                        <h2 className="text-lg font-bold text-white tracking-tight">Data Source</h2>
+                        <div className="flex items-center gap-2 mt-1">
+                          {['manual', 'upload'].map((mode) => (
+                            <button
+                              key={mode}
+                              onClick={() => setInputMode(mode)}
+                              className={`text-xs px-2 py-0.5 rounded transition-colors ${inputMode === mode
+                                ? 'bg-blue-600/20 text-blue-400 font-semibold border border-blue-500/30'
+                                : 'text-slate-500 hover:text-slate-300'}`}
+                            >
+                              {mode === 'manual' ? 'Manual' : 'Upload'}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
 
-                  {/* Modern Toggle Switch */}
-                  <div className="flex bg-slate-900/50 p-1 rounded-xl border border-slate-700/50 backdrop-blur-sm">
-                    {['manual', 'upload'].map((mode) => (
-                      <button
-                        key={mode}
-                        onClick={() => setInputMode(mode)}
-                        className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 ${inputMode === mode
-                          ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20'
-                          : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'
-                          }`}
-                      >
-                        {mode === 'manual' ? 'Manual Entry' : 'File Upload'}
-                      </button>
-                    ))}
+                    {/* Upload Controls (Only in Upload Mode) */}
+                    {inputMode === 'upload' && (
+                      <div className="flex flex-1 md:justify-end gap-3">
+                        <label className="cursor-pointer group flex items-center gap-3 px-4 py-2 bg-slate-800 rounded-lg border border-slate-700 hover:border-blue-500/50 transition-all">
+                          <div className="p-1.5 bg-blue-500/10 rounded group-hover:bg-blue-500/20 transition-colors">
+                            <MessageSquare className="w-4 h-4 text-blue-400" />
+                          </div>
+                          <div className="text-left">
+                            <div className="text-xs font-semibold text-slate-300 group-hover:text-blue-400 transition-colors">Chat JSON</div>
+                            <div className="text-[10px] text-slate-500">Upload conversation</div>
+                          </div>
+                          <input type="file" accept=".json" onChange={(e) => handleFileUpload(e, 'chat')} className="hidden" />
+                        </label>
+
+                        <label className="cursor-pointer group flex items-center gap-3 px-4 py-2 bg-slate-800 rounded-lg border border-slate-700 hover:border-purple-500/50 transition-all">
+                          <div className="p-1.5 bg-purple-500/10 rounded group-hover:bg-purple-500/20 transition-colors">
+                            <Database className="w-4 h-4 text-purple-400" />
+                          </div>
+                          <div className="text-left">
+                            <div className="text-xs font-semibold text-slate-300 group-hover:text-purple-400 transition-colors">Context JSON</div>
+                            <div className="text-[10px] text-slate-500">Upload vectors</div>
+                          </div>
+                          <input type="file" accept=".json" onChange={(e) => handleFileUpload(e, 'context')} className="hidden" />
+                        </label>
+                      </div>
+                    )}
                   </div>
                 </div>
 
                 {inputMode === 'upload' ? (
                   <div className="space-y-6 animate-fade-in">
-                    {/* Modern Upload Cards */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
 
-                      {/* Chat Upload Card */}
-                      <div className="group relative p-6 bg-slate-800/30 rounded-2xl border-2 border-dashed border-slate-700 hover:border-blue-500/50 transition-all duration-300 hover:bg-slate-800/50">
-                        <div className="absolute top-4 right-4">
-                          <div className="w-2 h-2 rounded-full bg-slate-600 group-hover:bg-blue-400 transition-colors"></div>
-                        </div>
-                        <div className="flex flex-col items-center text-center space-y-4">
-                          <div className="p-3 bg-blue-500/10 rounded-full group-hover:scale-110 transition-transform duration-300">
-                            <MessageSquare className="w-6 h-6 text-blue-400" />
-                          </div>
-                          <div>
-                            <h3 className="text-base font-semibold text-white mb-1">Conversation JSON</h3>
-                            <p className="text-xs text-slate-400">Upload chat logs (OpenAI/LangChain)</p>
-                          </div>
-                          <label className="cursor-pointer">
-                            <span className="px-4 py-2 rounded-lg bg-blue-600/10 text-blue-400 text-xs font-semibold hover:bg-blue-600 hover:text-white transition-all duration-200 border border-blue-500/20">
-                              Select File
-                            </span>
-                            <input
-                              type="file"
-                              accept=".json"
-                              onChange={(e) => handleFileUpload(e, 'chat')}
-                              className="hidden"
-                            />
-                          </label>
-                          <p className="text-[10px] text-slate-500 font-mono">.json supported</p>
-                        </div>
-                      </div>
-
-                      {/* Context Upload Card */}
-                      <div className="group relative p-6 bg-slate-800/30 rounded-2xl border-2 border-dashed border-slate-700 hover:border-purple-500/50 transition-all duration-300 hover:bg-slate-800/50">
-                        <div className="absolute top-4 right-4">
-                          <div className="w-2 h-2 rounded-full bg-slate-600 group-hover:bg-purple-400 transition-colors"></div>
-                        </div>
-                        <div className="flex flex-col items-center text-center space-y-4">
-                          <div className="p-3 bg-purple-500/10 rounded-full group-hover:scale-110 transition-transform duration-300">
-                            <Database className="w-6 h-6 text-purple-400" />
-                          </div>
-                          <div>
-                            <h3 className="text-base font-semibold text-white mb-1">Vector Context</h3>
-                            <p className="text-xs text-slate-400">Upload retrieved RAG documents</p>
-                          </div>
-                          <label className="cursor-pointer">
-                            <span className="px-4 py-2 rounded-lg bg-purple-600/10 text-purple-400 text-xs font-semibold hover:bg-purple-600 hover:text-white transition-all duration-200 border border-purple-500/20">
-                              Select File
-                            </span>
-                            <input
-                              type="file"
-                              accept=".json"
-                              onChange={(e) => handleFileUpload(e, 'context')}
-                              className="hidden"
-                            />
-                          </label>
-                          <p className="text-[10px] text-slate-500 font-mono">.json (Smart Extract)</p>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="flex justify-end mb-6">
-                      <button
-                        onClick={loadPresetSamples}
-                        className="flex items-center gap-2 text-xs font-medium text-slate-400 hover:text-blue-400 transition-colors group"
-                      >
-                        <PlayCircle className="w-3 h-3 group-hover:scale-110 transition-transform" />
-                        Load Demo Samples
-                      </button>
-                    </div>
-
-                    {/* Evaluation Strategy Toggle */}
-                    <div className="flex items-center justify-between bg-slate-800/50 p-4 rounded-lg border border-slate-700/50 mb-4 transition-all hover:border-blue-500/30">
-                      <div className="flex items-center gap-2">
-                        <label className="text-sm font-medium text-slate-300">Evaluation Strategy:</label>
-                        <div className="group relative">
-                          <Info className="w-4 h-4 text-slate-500 cursor-help" />
-                          <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 p-3 bg-slate-900 text-xs text-slate-300 rounded-lg border border-slate-700 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-20 shadow-xl">
-                            <p className="mb-2"><strong className="text-blue-400">Smart Eval (Default):</strong> Target the last user query and AI response. Best for RAG accuracy.</p>
-                            <p><strong className="text-purple-400">Overall Eval:</strong> Concatenates entire history. Best for summarizing the whole conversation.</p>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="flex bg-slate-900 p-1 rounded-lg border border-slate-700">
+                    {/* Strategy Toggle & Samples */}
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-slate-700/50">
+                      <div className="flex items-center gap-3 bg-slate-900/50 p-1 rounded-lg border border-slate-700/50">
                         <button
                           onClick={() => setEvalStrategy('smart')}
-                          className={`px-3 py-1.5 rounded text-xs font-medium transition-all ${evalStrategy === 'smart'
-                            ? 'bg-blue-600 text-white shadow'
-                            : 'text-slate-400 hover:text-white'}`}
+                          className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all flex items-center gap-2 ${evalStrategy === 'smart'
+                            ? 'bg-blue-600 text-white shadow-lg shadow-blue-900/20'
+                            : 'text-slate-400 hover:text-white hover:bg-slate-800'}`}
                         >
+                          <Zap className="w-3 h-3" />
                           Smart Eval
                         </button>
                         <button
                           onClick={() => setEvalStrategy('overall')}
-                          className={`px-3 py-1.5 rounded text-xs font-medium transition-all ${evalStrategy === 'overall'
-                            ? 'bg-purple-600 text-white shadow'
-                            : 'text-slate-400 hover:text-white'}`}
+                          className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all flex items-center gap-2 ${evalStrategy === 'overall'
+                            ? 'bg-purple-600 text-white shadow-lg shadow-purple-900/20'
+                            : 'text-slate-400 hover:text-white hover:bg-slate-800'}`}
                         >
+                          <FileText className="w-3 h-3" />
                           Overall Eval
                         </button>
                       </div>
+
+                      <button onClick={loadPresetSamples} className="text-xs flex items-center gap-1 text-slate-500 hover:text-blue-400 transition-colors font-medium">
+                        <PlayCircle className="w-3 h-3" />
+                        Load Demo Data
+                      </button>
                     </div>
 
-                    {/* Scrollable Chat Preview */}
-                    {(chatHistory.length > 0 || context) && (
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
 
-                        {/* Left Col: Conversation History */}
-                        <div className="bg-slate-900 rounded-lg border border-slate-700 flex flex-col h-96">
-                          <div className="px-4 py-3 border-b border-slate-800 bg-slate-900/50 rounded-t-lg">
-                            <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Full Conversation Flow</span>
+                    {/* Main Dashboard Grid */}
+                    {(chatHistory.length > 0 || context) && (
+                      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 h-[600px]">
+
+                        {/* Left Panel: Chat Interface (7 cols) */}
+                        <div className="lg:col-span-7 bg-slate-900 rounded-xl border border-slate-700 flex flex-col overflow-hidden shadow-2xl">
+                          {/* Chat Header */}
+                          <div className="px-5 py-4 border-b border-slate-800 bg-slate-900/80 backdrop-blur flex items-center justify-between">
+                            <h3 className="text-sm font-bold text-white flex items-center gap-2">
+                              <MessageSquare className="w-4 h-4 text-blue-500" />
+                              Conversation Flow
+                            </h3>
+                            <span className="text-[10px] px-2 py-1 rounded-full bg-slate-800 text-slate-400 border border-slate-700">
+                              {chatHistory.length} Turns
+                            </span>
                           </div>
-                          <div className="flex-1 overflow-y-auto p-4 space-y-4">
+
+                          {/* Messages Area */}
+                          <div className="flex-1 overflow-y-auto p-5 space-y-6 bg-slate-900/50 scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent">
                             {chatHistory.length > 0 ? (
                               chatHistory.map((turn, idx) => (
-                                <div key={idx} className={`flex ${turn.role === 'User' ? 'justify-end' : 'justify-start'}`}>
-                                  <div className={`max-w-[85%] rounded-2xl px-4 py-3 text-sm leading-relaxed ${turn.role === 'User'
-                                    ? 'bg-blue-600 text-white rounded-br-none'
-                                    : 'bg-slate-800 text-slate-200 rounded-bl-none'
+                                <div key={idx} className={`flex gap-4 ${turn.role === 'User' ? 'flex-row-reverse' : 'flex-row'}`}>
+                                  {/* Avatar */}
+                                  <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${turn.role === 'User' ? 'bg-blue-600' : 'bg-purple-600'}`}>
+                                    <span className="text-xs font-bold text-white">{turn.role[0]}</span>
+                                  </div>
+
+                                  {/* Bubble */}
+                                  <div className={`max-w-[80%] rounded-2xl px-5 py-3.5 text-sm leading-relaxed shadow-sm ${turn.role === 'User'
+                                      ? 'bg-blue-600 text-white rounded-tr-none'
+                                      : 'bg-slate-800 text-slate-200 border border-slate-700 rounded-tl-none'
                                     }`}>
-                                    <div className="text-[10px] opacity-50 mb-1 uppercase font-bold tracking-wide">
-                                      {turn.role}
-                                    </div>
                                     {turn.message}
                                   </div>
                                 </div>
                               ))
                             ) : (
-                              <div className="text-center text-slate-600 text-sm mt-10">
-                                No conversation loaded.
+                              <div className="h-full flex flex-col items-center justify-center text-slate-500 opacity-50">
+                                <MessageSquare className="w-12 h-12 mb-2" />
+                                <p className="text-sm">No conversation history</p>
                               </div>
                             )}
                           </div>
-                          <div className="px-4 py-2 bg-slate-950 border-t border-slate-800 text-[10px] text-slate-500 text-center">
-                            {evalStrategy === 'smart'
-                              ? "Targeting last Interaction for Evaluation"
-                              : "Targeting Full Conversation for Evaluation"
-                            }
-                          </div>
                         </div>
 
-                        {/* Right Col: Context & Target Data */}
-                        <div className="flex flex-col h-96 gap-4">
+                        {/* Right Panel: Context & Analysis Data (5 cols) */}
+                        <div className="lg:col-span-5 flex flex-col gap-6 h-full">
+
                           {/* Context Viewer */}
-                          <div className="bg-slate-900 rounded-lg border border-slate-700 flex flex-col flex-1 overflow-hidden">
-                            <div className="px-4 py-3 border-b border-slate-800 bg-slate-900/50 flex items-center justify-between">
-                              <span className="text-xs font-semibold text-purple-400 uppercase tracking-wider">Retrieved Context</span>
+                          <div className="flex-1 bg-slate-900 rounded-xl border border-slate-700 flex flex-col overflow-hidden shadow-xl">
+                            <div className="px-4 py-3 border-b border-slate-800 bg-slate-900/80 backdrop-blur flex items-center justify-between">
+                              <h3 className="text-xs font-bold text-purple-400 flex items-center gap-2 uppercase tracking-wide">
+                                <Database className="w-3 h-3" />
+                                Retrieved Context
+                              </h3>
                               <div className="group relative">
-                                <Info className="w-3 h-3 text-slate-500 cursor-help" />
-                                <div className="absolute right-0 top-full mt-2 w-56 p-2 bg-slate-900 text-[10px] text-slate-300 rounded border border-slate-700 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-20 shadow-xl">
-                                  Smart Context automatically extracts relevant text and scores from uploaded files, filtering out metadata noise.
+                                <Info className="w-3 h-3 text-slate-600 hover:text-purple-400 transition-colors cursor-help" />
+                                <div className="absolute right-0 top-full mt-2 w-48 p-2 bg-slate-800 text-[10px] text-slate-300 rounded border border-slate-700 opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity z-10 shadow-xl">
+                                  Source documents used by the LLM.
                                 </div>
                               </div>
                             </div>
-                            <div className="flex-1 overflow-y-auto p-4">
-                              <p className="text-xs font-mono text-slate-400 whitespace-pre-wrap leading-relaxed">
-                                {context || <span className="opacity-30 italic">No context loaded...</span>}
-                              </p>
+                            <div className="flex-1 overflow-y-auto p-4 bg-slate-950/30">
+                              <pre className="text-[11px] font-mono text-slate-400 whitespace-pre-wrap leading-relaxed font-light">
+                                {context || <span className="text-slate-600 italic">No context data loaded...</span>}
+                              </pre>
                             </div>
                           </div>
 
-                          {/* Evaluation Target Preview */}
-                          <div className="bg-slate-900 rounded-lg border border-slate-700 p-4 h-1/3 flex flex-col justify-center relative group">
-                            <div className="flex items-center gap-2 mb-2">
-                              <div className="text-[10px] uppercase text-blue-400 font-bold">Analysis Target ({evalStrategy === 'smart' ? 'Latest Response' : 'Full Conversation'})</div>
-                              <Info className="w-3 h-3 text-slate-500 cursor-help" />
-                              {/* Tooltip */}
-                              <div className="absolute bottom-full left-0 mb-2 bg-slate-800 text-slate-300 text-[10px] p-2 rounded border border-slate-700 w-64 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10 shadow-xl">
-                                {evalStrategy === 'smart'
-                                  ? "We automatically target the final substantive response for deep evaluation to assess RAG performance."
-                                  : "We are evaluating the entire conversation history as a single document. Warning: May include conversational noise."
-                                }
+                          {/* Active Analysis Target */}
+                          <div className="h-1/3 bg-slate-900 rounded-xl border border-slate-700 flex flex-col overflow-hidden shadow-xl">
+                            <div className="px-4 py-2 border-b border-slate-800 bg-slate-900/80 flex items-center justify-between">
+                              <h3 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                                <Activity className="w-3 h-3" />
+                                Current Analysis Target
+                              </h3>
+                              <span className={`text-[10px] px-2 py-0.5 rounded-full border ${evalStrategy === 'smart' ? 'bg-blue-500/10 text-blue-400 border-blue-500/20' : 'bg-purple-500/10 text-purple-400 border-purple-500/20'}`}>
+                                {evalStrategy === 'smart' ? 'Smart Mode' : 'Overall Mode'}
+                              </span>
+                            </div>
+                            <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-gradient-to-b from-slate-900 to-slate-900/50">
+                              <div className="space-y-1">
+                                <div className="text-[10px] uppercase font-bold text-blue-500">Query</div>
+                                <div className="text-xs text-slate-300 line-clamp-2 pl-2 border-l-2 border-slate-700">{query || "Waiting..."}</div>
+                              </div>
+                              <div className="space-y-1">
+                                <div className="text-[10px] uppercase font-bold text-green-500">Response</div>
+                                <div className="text-xs text-slate-300 line-clamp-3 pl-2 border-l-2 border-slate-700">{response || "Waiting..."}</div>
                               </div>
                             </div>
-                            <div className="text-xs text-slate-300 truncate mb-1 border-l-2 border-blue-500 pl-2"><span className="opacity-50 text-[10px] uppercase">Query:</span> "{query}"</div>
-                            <div className="text-xs text-slate-300 truncate border-l-2 border-green-500 pl-2"><span className="opacity-50 text-[10px] uppercase">Response:</span> "{response}"</div>
                           </div>
-                        </div>
 
+                        </div>
                       </div>
                     )}
                   </div>
