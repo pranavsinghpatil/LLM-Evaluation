@@ -13,7 +13,14 @@ htmlcov/
 dist/
 build/
 # Virtual environment
-venv/
+virtualenv/
 env/
 /docs/
 *\__pycache__\
+
+# Node modules
+node_modules/
+
+# Log and text files
+*.log
+*.txt
