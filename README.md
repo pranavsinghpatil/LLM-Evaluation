@@ -17,7 +17,30 @@ It measures four critical reliability dimensions:
 
 This pipeline is built as part of the BeyondChats internship assignment and focuses on production-minded design, scalability, and interpretability.
 
+
 ---
+
+## 🎯 Problem & Solution
+
+### The Challenge
+LLMs are powerful but prone to **hallucinations**, **irrelevance**, and **incompleteness**. In a Retrieval-Augmented Generation (RAG) system, asking "What is the capital of France?" might get a correct answer, but asking highly specific or medical questions carries a risk of misinformation.
+Manually checking every response is **slow**, **expensive**, and **unscalable**.
+
+### Our Solution
+We built an automated **Evaluation Pipeline** that acts as a "Quality Control Check" for your LLM. It mathematically verifies the answer before showing it to the user.
+
+1.  **Strict Metric Checks**: Instead of "vibes", we use strict logic.
+    *   *Problem*: "The model is rambling."
+    *   *Solution*: **Relevance Metric** (Cosine Similarity) flags unrelated answers.
+2.  **Fact Verification**:
+    *   *Problem*: "The model made up a name."
+    *   *Solution*: **Hallucination Metric** (NER) checks if that name actually exists in your documents.
+3.  **Scalable Architecture**:
+    *   *Problem*: "We have 1 million users."
+    *   *Solution*: Our **FastAPI** backend is designed to run asynchronously and can be theoretically scaled horizontally.
+
+---
+
 
 ## 🚀 Key Features
 

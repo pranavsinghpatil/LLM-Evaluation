@@ -25,6 +25,33 @@ const HowItWorks = () => {
                 </div>
             </div>
 
+
+            {/* Problem & Solution Card */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div className="bg-red-900/10 border border-red-500/20 p-8 rounded-2xl">
+                    <div className="flex items-center gap-3 mb-4">
+                        <XCircle className="w-6 h-6 text-red-500" />
+                        <h3 className="text-xl font-bold text-white">The Problem</h3>
+                    </div>
+                    <p className="text-slate-300 leading-relaxed">
+                        LLMs are "stochastic parrots". They hallucinate facts, ramble irrelevantly, or miss the point entirely.
+                        In high-stakes fields like medicine or finance, a wrong answer isn't just annoying—it's dangerous.
+                        Manually reviewing every chat is impossible at scale.
+                    </p>
+                </div>
+
+                <div className="bg-green-900/10 border border-green-500/20 p-8 rounded-2xl">
+                    <div className="flex items-center gap-3 mb-4">
+                        <CheckCircle className="w-6 h-6 text-green-500" />
+                        <h3 className="text-xl font-bold text-white">Our Solution</h3>
+                    </div>
+                    <p className="text-slate-300 leading-relaxed">
+                        We built an automated <strong>Evaluation Pipeline</strong> that acts as a "Quality Control Check".
+                        By using mathematical metrics (Cosine Similarity, NER), we verify if an answer is <span className="text-green-400">Relevant</span>, <span className="text-blue-400">Complete</span>, and <span className="text-orange-400">Factually Grounded</span> before it reaches the user.
+                    </p>
+                </div>
+            </div>
+
             {/* The 3 Pillars - Feature Grid */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                 {/* Relevance Card */}
