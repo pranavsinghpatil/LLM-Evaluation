@@ -43,12 +43,20 @@ class Pipeline:
         if hallucination_score > 0.5:
             verdict = "FAIL"
             reasons.append("High hallucination risk")
+        elif hallucination_score > 0.1:
+            if verdict == "PASS": verdict = "WARN"
+            reasons.append("Potential hallucination")
         
-        if relevance_score < 0.1:
-            verdict = "FAIL"
-            reasons.append("Low relevance")
+        if relevance_score < 0.2:
+            # Only FAIL if really irrelevant, otherwise WARN
+            if relevance_score < 0.05:
+                verdict = "FAIL"
+                reasons.append("Irrelevant")
+            else:
+                if verdict == "PASS": verdict = "WARN"
+                reasons.append("Low relevance")
         
-        if verdict == "PASS" and completeness_score < 0.6:
+        if completeness_score < 0.5 and verdict == "PASS":
             verdict = "WARN"
             reasons.append("Incomplete answer")
 
