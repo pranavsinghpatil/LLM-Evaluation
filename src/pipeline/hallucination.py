@@ -1,11 +1,7 @@
 from typing import List, Set
-import nltk
-from nltk.util import ngrams
-
 import spacy
-from typing import List, Set
-import nltk
-from nltk.util import ngrams
+# Load Spacy model (Medium model used for vectors)
+from .model import nlp
 
 # Load Spacy model (Medium model used for vectors)
 from .model import nlp
@@ -222,10 +218,15 @@ class HallucinationEvaluator:
         self.mode = mode
 
     def _get_ngrams(self, text: str) -> Set[str]:
-        tokens = nltk.word_tokenize(text.lower())
+        # Use Spacy for tokenization (already loaded) - avoids NLTK download issues
+        doc = nlp(text.lower())
+        tokens = [token.text for token in doc]
+        
         if len(tokens) < self.n:
             return set()
-        return set(ngrams(tokens, self.n))
+            
+        # Manual n-gram generation
+        return {tuple(tokens[i:i+self.n]) for i in range(len(tokens) - self.n + 1)}
 
     def _extract_entities(self, text: str) -> Set[str]:
         """Legacy extraction for 'legacy' mode."""
