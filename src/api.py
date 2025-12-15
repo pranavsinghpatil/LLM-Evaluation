@@ -2,9 +2,22 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import List, Optional
-from pipeline.evaluation import Pipeline
 import uvicorn
 import os
+import sys
+
+# Allow importing from 'src' root
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+try:
+    from src.pipeline.evaluation import Pipeline
+except ImportError:
+    try:
+        from pipeline.evaluation import Pipeline
+    except ImportError:
+        # Last resort for local runs inside src
+        sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
+        from pipeline.evaluation import Pipeline
 
 app = FastAPI(
     title="LLM Evaluation Microservice",
