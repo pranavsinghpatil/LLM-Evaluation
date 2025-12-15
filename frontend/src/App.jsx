@@ -10,11 +10,14 @@ import {
   FileText,
   Info,
   PlayCircle,
+  Copy,
+  Download,
 } from "lucide-react";
 import HowItWorks from "./HowItWorks";
 
 // API URL - uses environment variable in production
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
+// API URL - uses environment variable in production. Trims trailing slash if present.
+const API_URL = (import.meta.env.VITE_API_URL || "http://localhost:8000").replace(/\/$/, "");
 
 function App() {
   const [activeTab, setActiveTab] = useState("evaluator"); // 'evaluator' | 'how-it-works'
@@ -52,7 +55,14 @@ function App() {
       });
 
       if (!res.ok) {
-        throw new Error(`Error: ${res.statusText}`);
+        let errorMsg = `Server Error (${res.status})`;
+        try {
+          const errData = await res.json();
+          if (errData.detail) errorMsg = errData.detail;
+        } catch (e) {
+          // ignore invalid json
+        }
+        throw new Error(errorMsg);
       }
 
       const data = await res.json();
@@ -281,6 +291,25 @@ function App() {
     cleanText = cleanText.replace(/,\s*([\\\]}])/g, "$1");
 
     return JSON.parse(cleanText);
+  };
+
+  const handleCopyJson = () => {
+    if (!result) return;
+    navigator.clipboard.writeText(JSON.stringify(result, null, 2));
+    // Optional: show toast, but for now user will see visual feedback or just assume it worked
+  };
+
+  const handleDownloadJson = () => {
+    if (!result) return;
+    const blob = new Blob([JSON.stringify(result, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "evaluation_report.json";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
   };
 
   const handleFileUpload = (event, type) => {
@@ -638,8 +667,26 @@ function App() {
                   {/* JSON Dump */}
                   <div className="glass-panel p-0 rounded-xl overflow-hidden text-xs">
                     <div className="px-4 py-2 bg-slate-950/80 border-b border-white/5 flex justify-between items-center text-slate-500">
-                      <span className="font-mono">RAW_JSON_OUTPUT</span>
-                      <Database className="w-3 h-3" />
+                      <div className="flex items-center gap-2">
+                        <Database className="w-3 h-3" />
+                        <span className="font-mono">RAW_JSON_OUTPUT</span>
+                      </div>
+                      <div className="flex gap-2">
+                        <button
+                          onClick={handleCopyJson}
+                          className="hover:text-white transition-colors p-1 rounded hover:bg-white/5"
+                          title="Copy to Clipboard"
+                        >
+                          <Copy className="w-3.5 h-3.5" />
+                        </button>
+                        <button
+                          onClick={handleDownloadJson}
+                          className="hover:text-white transition-colors p-1 rounded hover:bg-white/5"
+                          title="Download .json"
+                        >
+                          <Download className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
                     </div>
                     <pre className="p-4 overflow-x-auto text-emerald-400/90 font-mono leading-relaxed">
                       {JSON.stringify(result, null, 2)}
