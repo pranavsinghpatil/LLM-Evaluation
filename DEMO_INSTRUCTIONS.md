@@ -1,45 +1,92 @@
-# LLM Evaluation Pipeline - Demo Instructions
+# 🎬 Demo Instructions
 
-This project now includes a modern **Frontend Web Application** to visualize the evaluation pipeline, in addition to the standard CLI.
+## Quick Demo (2 Minutes)
 
-## Why a Frontend?
-For a demo or selection process, a frontend provides:
-1.  **Transparency**: Visualizes the "black box" metrics (Relevance, Completeness, Hallucination).
-2.  **Interactivity**: Allows the user to play with different inputs and see results in real-time.
-3.  **Aesthetics**: Demonstrates "product-minded" engineering with a polished UI.
-
-## How to Run the Demo
-
-You need two terminals.
-
-### Terminal 1: Start the Backend API
-This runs the evaluation logic.
-
+### Step 1: Start the Backend
 ```bash
-# Make sure you are in the root directory
-python src/api.py
+cd LLM-Evaluation-Pipeline
+set PYTHONPATH=src
+uvicorn src.api:app --host 0.0.0.0 --port 8000
 ```
-*The API will start on http://localhost:8000*
 
-### Terminal 2: Start the Frontend UI
-This runs the web interface.
+Wait for: `Uvicorn running on http://0.0.0.0:8000`
 
+### Step 2: Start the Frontend
 ```bash
 cd frontend
 npm run dev
 ```
-*The UI will start on http://localhost:5173*
 
-## Features
-- **Real-time Evaluation**: Enter a query, response, and context to get immediate scores.
-- **File Upload Support**: Upload `conversation.json` and `context.json` files directly (supports complex formats).
-- **Visual Metrics**: Color-coded score cards for quick assessment.
-- **Verdict Explanation**: Detailed breakdown of why a response passed or failed.
-- **JSON Inspection**: View the raw JSON output for technical deep-dives.
-- **Educational Mode**: "How it Works" page explains the inner workings of the pipeline.
+Wait for: `Local: http://localhost:5173`
 
-## CLI Usage (Original)
-If you prefer the command line:
+### Step 3: Open the Dashboard
+Navigate to **http://localhost:5173**
+
+---
+
+## Demo Scenarios
+
+### Scenario 1: Successful Evaluation (PASS)
+
+**Query:** What is the capital of France?
+**Response:** The capital of France is Paris.
+**Context:** France is a country in Europe. Paris is the capital city of France.
+
+**Expected Result:** ✅ PASS (High relevance, low hallucination)
+
+---
+
+### Scenario 2: Hallucination Detection (FAIL)
+
+**Query:** What is the price?
+**Response:** The product costs $999 and was released on January 15, 2025.
+**Context:** Our product is available for purchase.
+
+**Expected Result:** ❌ FAIL
+- Reason: "High hallucination: Unsupported claims found: $999, January 15, 2025"
+
+---
+
+### Scenario 3: Low Relevance (WARN/FAIL)
+
+**Query:** What's the weather today?
+**Response:** The mitochondria is the powerhouse of the cell.
+**Context:** Weather information for today.
+
+**Expected Result:** ❌ FAIL (Irrelevant response)
+
+---
+
+## Using Sample Files
+
+1. Click "Load Sample Data" button in the dashboard
+2. The sample conversation and context will be loaded
+3. Click "Run Evaluation"
+
+---
+
+## API Testing (cURL)
+
 ```bash
-python src/main.py --conv samples/sample-chat-1.json --ctx samples/sample-context-1.json --out report.json
+curl -X POST http://localhost:8000/evaluate \
+  -H "Content-Type: application/json" \
+  -d '{
+    "query": "How much does it cost?",
+    "response": "It costs $50.",
+    "context": ["The product is priced at $50."]
+  }'
 ```
+
+---
+
+## Troubleshooting
+
+| Issue | Solution |
+|-------|----------|
+| "Failed to fetch" | Ensure backend is running on port 8000 |
+| Slow first request | Spacy model loading (one-time, ~5s) |
+| CORS error | Backend must be started with PYTHONPATH=src |
+
+---
+
+**Ready to demo! 🚀**

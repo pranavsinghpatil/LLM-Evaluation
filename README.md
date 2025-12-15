@@ -1,212 +1,308 @@
+# 🔍 LLM Evaluation Pipeline
 
-# LLM Response Evaluation Pipeline  
-*A modular, scalable system for evaluating relevance, completeness, hallucination, and latency of LLM-generated responses.*
+<div align="center">
 
----
+![Python](https://img.shields.io/badge/Python-3.9+-blue?logo=python&logoColor=white)
+![FastAPI](https://img.shields.io/badge/FastAPI-0.100+-green?logo=fastapi&logoColor=white)
+![React](https://img.shields.io/badge/React-18+-61DAFB?logo=react&logoColor=black)
+![Spacy](https://img.shields.io/badge/Spacy-NLP-09A3D5?logo=spacy&logoColor=white)
 
-## 📌 Overview
+**A production-ready evaluation system for RAG-based LLM applications**
 
-This project implements an automated evaluation engine designed for real-time assessment of LLM responses.  
+[Live Demo](#-quick-start) • [Documentation](#-documentation) • [API Reference](#-api-reference) • [Contributing](#-contributing)
 
-It measures four critical reliability dimensions:
-
-1. **Relevance** — Does the answer match the user's intent?
-2. **Completeness** — Does it cover all required parts of the question?
-3. **Hallucination Detection** — Are the claims grounded in retrieved context?
-4. **Latency & Cost** — How efficient is the evaluation?
-
-This pipeline is built as part of the BeyondChats internship assignment and focuses on production-minded design, scalability, and interpretability.
-
+</div>
 
 ---
 
-## 🎯 Problem & Solution
+## 🎯 What is This?
 
-### The Challenge
-LLMs are powerful but prone to **hallucinations**, **irrelevance**, and **incompleteness**. In a Retrieval-Augmented Generation (RAG) system, asking "What is the capital of France?" might get a correct answer, but asking highly specific or medical questions carries a risk of misinformation.
-Manually checking every response is **slow**, **expensive**, and **unscalable**.
+An automated **Quality Control System** for LLM responses. Before showing an AI-generated answer to your users, this pipeline checks:
 
-### Our Solution
-We built an automated **Evaluation Pipeline** that acts as a "Quality Control Check" for your LLM. It mathematically verifies the answer before showing it to the user.
-
-1.  **Strict Metric Checks**: Instead of "vibes", we use strict logic.
-    *   *Problem*: "The model is rambling."
-    *   *Solution*: **Relevance Metric** (Cosine Similarity) flags unrelated answers.
-2.  **Fact Verification**:
-    *   *Problem*: "The model made up a name."
-    *   *Solution*: **Hallucination Metric** (NER) checks if that name actually exists in your documents.
-3.  **Scalable Architecture**:
-    *   *Problem*: "We have 1 million users."
-    *   *Solution*: Our **FastAPI** backend is designed to run asynchronously and can be theoretically scaled horizontally.
+| Metric | What it Checks | How |
+|--------|---------------|-----|
+| **Relevance** | Does the answer match the user's intent? | Intent-Entity Alignment + Vector Similarity |
+| **Completeness** | Are all parts of the question addressed? | Semantic Coverage + Slot Fulfillment |
+| **Hallucination** | Are claims grounded in retrieved context? | NER-based Claim Verification |
+| **Latency/Cost** | Is it production-ready? | Mandated thresholds (< 2s, < $0.05) |
 
 ---
 
+## ⚡ Quick Start
 
-## 🚀 Key Features
+### 1. Clone & Install
 
-- **Deep Semantic Understanding** — uses Vector Embeddings (`en_core_web_md`) for precise meaning matching.
-- **Microservice-ready** — includes a FastAPI server (`src/api.py`) for real-time deployment.
-- **Advanced Hallucination Detection** — uses Spacy NER to verify specific claims (Dates, Numbers, SVOs).
-- **Mandated Reliability** — Strict Fail/Warn thresholds for Latency (>2s) and Cost (>$0.05).
-- **Retrieval-backed verification** — uses context vectors from a vector DB.
-- **Structured JSON Reports** with detailed metrics and final verdict.
+```bash
+git clone https://github.com/pranavsinghpatil/LLM-Evaluation-Pipeline.git
+cd LLM-Evaluation-Pipeline
+
+# Backend
+pip install -r requirements.txt
+python -m spacy download en_core_web_md
+
+# Frontend
+cd frontend && npm install
+```
+
+### 2. Start the Services
+
+```bash
+# Terminal 1: Backend API
+cd LLM-Evaluation-Pipeline
+set PYTHONPATH=src && uvicorn src.api:app --host 0.0.0.0 --port 8000
+
+# Terminal 2: Frontend
+cd frontend
+npm run dev
+```
+
+### 3. Open the Dashboard
+
+Visit **http://localhost:5173** and start evaluating!
 
 ---
 
-## 📁 Repository Structure
+## 🖥️ Screenshots
+
+### Evaluation Dashboard
+The intuitive interface allows you to:
+- Upload conversation history (JSON)
+- Upload retrieved context (JSON)
+- Run evaluations with a single click
+- View detailed metrics and verdicts
+
+### Sample Output
+```json
+{
+  "metrics": {
+    "relevance": 0.85,
+    "completeness": 0.92,
+    "hallucination": 0.0,
+    "latency_ms": 45.2,
+    "estimated_cost_usd": 0.00004
+  },
+  "verdict": {
+    "status": "PASS",
+    "reasons": []
+  }
+}
+```
+
+---
+
+## 🧠 Deep Semantic Architecture
+
+### Why Vector Embeddings?
+
+Traditional evaluation uses **keyword matching** which fails on:
+- "I am sad" vs "Don't be unhappy" (synonyms)
+- "The cost is $50" vs "It's fifty dollars" (paraphrasing)
+
+We use **Spacy's `en_core_web_md`** model with 20k+ word vectors for true semantic understanding:
+
+```python
+# Old approach (fails)
+"sad" in "unhappy"  # False
+
+# Our approach (works)
+nlp("sad").similarity(nlp("unhappy"))  # 0.72 ✓
+```
+
+### Evaluation Flow
 
 ```
-llm-eval-pipeline/
-│
-├── docs/
-│   ├── tech/                 # Technical Module Documentation
-│   │   ├── module-metric-relevance.md
-│   │   ├── module-metric-completeness.md
-│   │   ├── module-metric-hallucination.md
-│   │   └── ...
+┌─────────────┐     ┌─────────────┐     ┌─────────────┐
+│   Query     │ ──► │  Pipeline   │ ──► │   Verdict   │
+│  Response   │     │  Evaluator  │     │   Report    │
+│  Context    │     │             │     │             │
+└─────────────┘     └─────────────┘     └─────────────┘
+                           │
+         ┌─────────────────┼─────────────────┐
+         ▼                 ▼                 ▼
+   ┌──────────┐     ┌──────────┐     ┌──────────┐
+   │Relevance │     │Complete- │     │Hallucin- │
+   │ Scorer   │     │  ness    │     │  ation   │
+   └──────────┘     └──────────┘     └──────────┘
+```
+
+---
+
+## 📂 Project Structure
+
+```
+LLM-Evaluation-Pipeline/
 │
 ├── src/
 │   ├── pipeline/
-│   │   ├── model.py          # Shared Spacy Model Loader
-│   │   ├── relevance.py      # Vector & Intent Scoring
-│   │   ├── completeness.py   # Semantic Coverage & Slots
-│   │   ├── hallucination.py  # Claim Verification
-│   │   ├── latency_cost.py
-│   │   └── evaluation.py     # Orchestrator & Verdict Logic
-│   └── api.py                # FastAPI Server
+│   │   ├── model.py           # Shared Spacy model (singleton)
+│   │   ├── relevance.py       # Intent + Vector scoring
+│   │   ├── completeness.py    # Semantic coverage
+│   │   ├── hallucination.py   # Claim extraction & verification
+│   │   ├── latency_cost.py    # Performance tracking
+│   │   └── evaluation.py      # Orchestrator & verdict logic
+│   └── api.py                 # FastAPI endpoints
 │
-├── frontend/                 # React Dashboard
+├── frontend/                  # React + Vite + TailwindCSS
+│   ├── src/
+│   │   └── App.jsx           # Main dashboard component
+│   └── package.json
 │
-└── requirements.txt
+├── docs/                      # Architecture & design docs
+├── samples/                   # Example JSON files
+├── tests/                     # Test suites
+│
+├── requirements.txt           # Python dependencies
+└── README.md                  # You are here
 ```
 
 ---
 
-## 🧠 How It Works
+## 🔧 API Reference
 
-### 1️⃣ Input  
-The pipeline accepts a JSON payload:
-- **Query**
-- **Response**
-- **Context** (List of retrieved document strings)
+### POST `/evaluate`
 
-### 2️⃣ Evaluation Core  
-Each module computes an independent score using **Deep Semantics**:
+Evaluate a query-response pair against retrieved context.
 
-| Module | Methodology | Scoring Logic |
-|--------|-------------|---------------|
-| **Relevance** | **Intent-Entity Alignment** + **Vector Cosine Similarity** | Intent Match (0.85) > Vector Sim > Lemma Jaccard. |
-| **Completeness** | **Semantic Coverage** + **Intent Slots** | Vectors capture "meaning" even if keywords miss. Bonuses for conversational follow-ups. |
-| **Hallucination** | **Fact Verification** (NER) | Extracts Claims (Dates, Money, SVO). Verifies against context. Score = Weighted Error Rate. |
-| **Latency/Cost** | **Mandated Checks** | **WARN** if > 2000ms or > $0.05. |
-
-### 3️⃣ Verdict Logic
-Scores → combined into a final **verdict**:
-- **FAIL**: High Hallucination (>0.5) or Irrelevance (<0.05).
-- **WARN**: Moderate Hallucination, Incomplete, High Latency, or High Cost.
-- **PASS**: All checks clear.
-
-### 4️⃣ Output  
-A structured JSON report.
-
-```
-
+**Request:**
+```json
 {
-"metrics": {
-"relevance": {...},
-"completeness": {...},
-"hallucination": {...},
-"latency_and_cost": {...}
-},
-"verdict": {...},
-"summary_explanation": "..."
+  "query": "What is the price of the product?",
+  "response": "The product costs $49.99 and ships in 2 days.",
+  "context": ["Our flagship product is priced at $49.99.", "Shipping takes 2-3 business days."]
 }
+```
 
+**Response:**
+```json
+{
+  "metrics": {
+    "relevance": 0.85,
+    "completeness": 0.78,
+    "hallucination": 0.0,
+    "latency_ms": 52.3,
+    "estimated_cost_usd": 0.000056
+  },
+  "verdict": {
+    "status": "PASS",
+    "reasons": []
+  }
+}
+```
+
+### GET `/health`
+
+Health check endpoint.
+
+```json
+{"status": "healthy", "model": "en_core_web_md"}
 ```
 
 ---
 
-## ▶️ Running Locally
+## 📊 Verdict Logic
 
-### Install dependencies:
-```
+| Condition | Status | Example Reason |
+|-----------|--------|----------------|
+| Hallucination > 0.5 | **FAIL** | "High hallucination: Unsupported claims found: $999, Jan 2025" |
+| Relevance < 0.05 | **FAIL** | "Irrelevant" |
+| Hallucination > 0.1 | **WARN** | "Potential hallucination: March 15" |
+| Completeness < 0.5 | **WARN** | "Incomplete answer" |
+| Latency > 2000ms | **WARN** | "Latency > 2000ms" |
+| Cost > $0.05 | **WARN** | "Cost limit exceeded" |
+| All checks pass | **PASS** | [] |
 
-pip install -r requirements.txt
+---
 
-```
+## 🛠️ Tech Stack
 
-### Run pipeline:
-```
+| Layer | Technology | Purpose |
+|-------|------------|---------|
+| **Backend** | Python 3.9+, FastAPI | REST API & evaluation logic |
+| **NLP** | Spacy (`en_core_web_md`) | Vector embeddings, NER, lemmatization |
+| **Frontend** | React 18, Vite, TailwindCSS | Interactive dashboard |
+| **Testing** | Pytest, Unittest | Automated test suites |
 
-python src/main.py --conv samples/sample-chat-1.json --ctx samples/sample-context-1.json --out report.json
+---
 
-```
+## 🎓 Key Design Decisions
+
+### 1. Intent-Entity Alignment (Relevance)
+- Detects query intent ("how much?" → expects MONEY entity)
+- Awards high score (0.85) if response contains matching entity type
+- Fallback to vector similarity for general queries
+
+### 2. Claim-Based Hallucination Detection
+- Extracts verifiable "anchors": Numbers, Dates, SVO triplets
+- Verifies each anchor against context
+- Weighted scoring: Facts (1.0) > Claims (0.5)
+
+### 3. Mandated Production Limits
+- Latency > 2s → WARN (ensures responsiveness)
+- Cost > $0.05 → WARN (prevents budget overruns)
 
 ---
 
 ## 📚 Documentation
 
-To keep this project clean and maintainable, **all reasoning, architecture, and conceptual explanations** are documented in the `/docs` folder.
+Detailed documentation is available in `/docs`:
 
-Start here:
-- **00-overview.md** → What this project is  
-- **01-problem-statement.md** → What BeyondChats requires  
-- **02-requirements.md** → Functional & non-functional specs  
-- **03-architecture.md** → System design  
-- **04-evaluation-criteria.md** → Scoring formulas  
-- **05-design-decisions.md** → Why each approach was chosen  
-- **06-scaling-strategy.md** → Production scaling plan  
-- **07-future-improvements.md** → Long-term roadmap  
-- **glossary.md** → All terminology
-
-This level of documentation demonstrates clarity, professionalism, and strong engineering habits.
+| File | Contents |
+|------|----------|
+| `00-overview.md` | Project introduction |
+| `01-problem-statement.md` | The challenge we're solving |
+| `02-requirements.md` | Functional specifications |
+| `03-architecture.md` | System design diagrams |
+| `04-evaluation-criteria.md` | Scoring formulas explained |
+| `05-design-decisions.md` | Why we chose each approach |
+| `06-scaling-strategy.md` | Production scaling plan |
+| `07-future-improvements.md` | Roadmap |
 
 ---
 
-## 🎯 Why This Approach?
+## 🚀 Future Roadmap
 
-- **Realistic for production** — focuses on computation cost and latency.  
-- **Modular** — easy to swap TF-IDF → embeddings → cross-encoders.  
-- **Interpretable** — avoids “black box” scoring.  
-- **Extensible** — supports future LLM evaluation & AI safety layers.  
-- **Scalable** — designed with millions of daily evaluations in mind.  
-
-This combination stands out in internship evaluations.
-
----
-
-## 🔮 Future Extensions
-
-(Full details in `07-future-improvements.md`)
-
-- embedding-based scoring  
-- NER-based claim extraction  
-- cross-encoder factual verification  
-- external knowledge base checks  
-- distributed microservices  
-- async deep evaluation mode  
-- human-in-the-loop correction pipeline  
+- [ ] **Batch Evaluation**: Process multiple conversations at once
+- [ ] **Streaming Support**: WebSocket-based real-time evaluation
+- [ ] **Custom Thresholds**: User-configurable pass/fail limits
+- [ ] **Export Reports**: PDF/CSV export functionality
+- [ ] **Multi-language**: Support for non-English evaluation
+- [ ] **LLM-as-Judge**: Optional GPT-4 verification layer
 
 ---
 
-## ✨ Final Thoughts
+## 🤝 Contributing
 
-This project demonstrates not only an implementation but a **holistic understanding** of:
+Contributions are welcome! Please:
 
-- LLM behavior  
-- retrieval systems  
-- hallucination dynamics  
-- scalable architecture  
-- AI evaluation theory  
-- cost & latency constraints  
-
-The emphasis on clarity, correctness, and scalability aligns directly with BeyondChats’ expectations.
-
-If reviewing this repo, one should immediately see a candidate who thinks like a **product-minded ML engineer**, not just a coder.
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
 ---
 
-**Created with care, precision, and an engineering-first mindset.**  
-Designed to be extended, deployed, and improved over time.
+## 📄 License
 
-Just tell me what you'd like next.
+This project is open source and available under the [MIT License](LICENSE).
+
+---
+
+## 👤 Author
+
+**Pranav Singh Patil**
+
+- Website: [prnav.me](https://prnav.me)
+- GitHub: [@pranavsinghpatil](https://github.com/pranavsinghpatil)
+- Twitter: [@pranavenv](https://twitter.com/pranavenv)
+- LinkedIn: [pranavsinghpatil](https://linkedin.com/in/pranavsinghpatil)
+
+---
+
+<div align="center">
+
+**Built with ❤️ for reliable AI**
+
+*Making LLMs trustworthy, one evaluation at a time.*
+
+</div>

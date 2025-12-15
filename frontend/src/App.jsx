@@ -13,6 +13,9 @@ import {
 } from "lucide-react";
 import HowItWorks from "./HowItWorks";
 
+// API URL - uses environment variable in production
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
+
 function App() {
   const [activeTab, setActiveTab] = useState("evaluator"); // 'evaluator' | 'how-it-works'
   const [inputMode, setInputMode] = useState("upload"); // 'manual' | 'upload'
@@ -36,7 +39,7 @@ function App() {
         .split("\n")
         .filter((line) => line.trim() !== "");
 
-      const res = await fetch("http://localhost:8000/evaluate", {
+      const res = await fetch(`${API_URL}/evaluate`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -1,26 +1,59 @@
-# Ignoring common Python build/distribution/packaging files
-.Python
-.project
-.settings
+# Python
 __pycache__/
-*.pyc
-*.pyo
-*.pyd
-*.egg-info/
-.coverage
-.pytest_cache/
-htmlcov/
-dist/
+*.py[cod]
+*$py.class
+*.so
+.Python
 build/
-# Virtual environment
-virtualenv/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual environments
+venv/
 env/
-/docs/
-*\__pycache__\
+.env
 
-# Node modules
-node_modules/
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
 
-# Log and text files
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+
+# Logs
 *.log
-*.txt
+
+# Node
+node_modules/
+.npm
+
+# Build outputs
+frontend/dist/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Vercel
+.vercel
+
+
+**/DEPLOYMENT.md
+**/DELIVERABLES_CHECKLIST.md
