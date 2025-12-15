@@ -290,17 +290,22 @@ class HallucinationEvaluator:
         
         return anchors
 
-    def evaluate(self, response: str, context: List[str]) -> float:
-        """Dispatches evaluation based on selected mode."""
+    def evaluate(self, response: str, context: List[str]) -> dict:
+        """
+        Dispatches evaluation based on selected mode.
+        Returns: dict with 'score' and 'unsupported_claims'
+        """
         if not response:
-            return 0.0
+            return {"score": 0.0, "unsupported_claims": []}
         if not context:
-            return 1.0
+            return {"score": 1.0, "unsupported_claims": [{"type": "context", "text": "No context provided", "reason": "Cannot verify claims without context"}]}
 
         if self.mode == "legacy":
-            return self._evaluate_legacy(response, context)
+            score = self._evaluate_legacy(response, context)
+            return {"score": score, "unsupported_claims": []}
         else:
-            return self._evaluate_claims(response, context)
+            score, claims = self._evaluate_claims(response, context)
+            return {"score": score, "unsupported_claims": claims}
 
     def _evaluate_legacy(self, response: str, context: List[str]) -> float:
         """
@@ -331,12 +336,10 @@ class HallucinationEvaluator:
 
         return float((0.6 * unsupported_fact_ratio) + (0.4 * ngram_score))
 
-    def _evaluate_claims(self, response: str, context: List[str]) -> float:
+    def _evaluate_claims(self, response: str, context: List[str]) -> tuple:
         """
-        NEW: Claim-Based Verification.
-        1. Extracts verifiable anchors.
-        2. Matches valid anchors against context.
-        3. Uses N-grams only as a broad topic safety gate.
+        Claim-Based Verification with detailed reporting.
+        Returns: (score, unsupported_claims_list)
         """
         full_context_text = " ".join(context).lower()
         
@@ -346,25 +349,29 @@ class HallucinationEvaluator:
         # If no verifiable claims are made, we can't fact-check.
         if not anchors:
             drift_score = self._get_topic_drift_score(response, context)
-            return drift_score
+            return (drift_score, [])
 
         # Step 2: Verification (Evidence Matching)
         total_weight = 0.0
         error_weight = 0.0
+        unsupported_claims = []
         
         for anchor in anchors:
             # Assign weights
-            # Facts (Numbers/Dates) are critical -> 1.0
-            # SVO Claims are softer/harder to verify -> 0.5
             weight = 1.0 if anchor["type"] in ["numeric", "date"] else 0.5
             total_weight += weight
             
             is_supported = self._verify_anchor(anchor, full_context_text)
             if not is_supported:
                 error_weight += weight
+                # Track the unsupported claim for reporting
+                unsupported_claims.append({
+                    "type": anchor["type"],
+                    "text": anchor["text"],
+                    "reason": f"'{anchor['text']}' not found in context"
+                })
         
         # Step 3: Calculation
-        # Score = Weighted Error Rate
         if total_weight > 0:
             claim_error_rate = error_weight / total_weight
         else:
@@ -372,12 +379,9 @@ class HallucinationEvaluator:
         
         # Step 4: Topic Drift Gate
         drift_penalty = self._get_topic_drift_score(response, context)
-        
-        # Final Score: Be lenient. If we verified *some* claims, don't let drift kill it.
-        # But if error rate is high, it stands.
         final_score = max(claim_error_rate, drift_penalty if claim_error_rate == 0 else 0)
         
-        return float(final_score)
+        return (float(final_score), unsupported_claims)
 
 
 

@@ -27,8 +27,10 @@ class Pipeline:
         # 2. Completeness
         completeness_score = self.completeness_evaluator.evaluate(query, response)
 
-        # 3. Hallucination
-        hallucination_score = self.hallucination_evaluator.evaluate(response, context)
+        # 3. Hallucination (now returns dict with score and details)
+        hallucination_result = self.hallucination_evaluator.evaluate(response, context)
+        hallucination_score = hallucination_result["score"]
+        unsupported_claims = hallucination_result["unsupported_claims"]
 
         self.cost_evaluator.stop_timer()
         
@@ -42,10 +44,19 @@ class Pipeline:
 
         if hallucination_score > 0.5:
             verdict = "FAIL"
-            reasons.append("High hallucination risk")
+            # Add detailed explanation of what was hallucinated
+            if unsupported_claims:
+                claim_texts = [c["text"] for c in unsupported_claims[:3]]  # Limit to 3
+                reasons.append(f"High hallucination: Unsupported claims found: {', '.join(claim_texts)}")
+            else:
+                reasons.append("High hallucination risk")
         elif hallucination_score > 0.1:
             if verdict == "PASS": verdict = "WARN"
-            reasons.append("Potential hallucination")
+            if unsupported_claims:
+                claim_texts = [c["text"] for c in unsupported_claims[:2]]
+                reasons.append(f"Potential hallucination: {', '.join(claim_texts)}")
+            else:
+                reasons.append("Potential hallucination")
         
         if relevance_score < 0.2:
             # Only FAIL if really irrelevant, otherwise WARN
