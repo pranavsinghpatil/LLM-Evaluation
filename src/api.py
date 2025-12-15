@@ -76,5 +76,15 @@ async def evaluate_response(request: EvalRequest):
 async def health_check():
     return {"status": "healthy", "model": "en_core_web_md"}
 
+@app.get("/")
+async def root():
+    return {"message": "LLM Evaluation Pipeline is running!", "docs": "/docs", "health": "/health"}
+
+# Leapcell/Internal probe handler
+@app.get("/kaithheathcheck")
+@app.get("/kaithhealthcheck") 
+async def probe_check():
+    return {"status": "ok"}
+
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)
