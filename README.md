@@ -44,53 +44,40 @@ We built an automated **Evaluation Pipeline** that acts as a "Quality Control Ch
 
 ## 🚀 Key Features
 
-- **Modular architecture** — relevance, completeness, hallucination, and cost scoring are separate modules.
+- **Deep Semantic Understanding** — uses Vector Embeddings (`en_core_web_md`) for precise meaning matching.
 - **Microservice-ready** — includes a FastAPI server (`src/api.py`) for real-time deployment.
-- **Advanced Hallucination Detection** — uses Spacy NER to verify entity consistency.
-- **Deterministic & interpretable scoring** — transparent formulas and thresholds.
-- **Retrieval-backed hallucination evaluation** — uses context vectors from a vector DB.
-- **Low-latency** (TF-IDF based) prototype suitable for real-time usage.
-- **Scalable design** — batching, caching, ANN search, async evaluation, horizontal scaling.
+- **Advanced Hallucination Detection** — uses Spacy NER to verify specific claims (Dates, Numbers, SVOs).
+- **Mandated Reliability** — Strict Fail/Warn thresholds for Latency (>2s) and Cost (>$0.05).
+- **Retrieval-backed verification** — uses context vectors from a vector DB.
 - **Structured JSON Reports** with detailed metrics and final verdict.
-- **Extensively documented** design, requirements, architecture, and future improvements.
 
 ---
 
 ## 📁 Repository Structure
 
 ```
-
 llm-eval-pipeline/
 │
 ├── docs/
-│   ├── 00-overview.md
-│   ├── 01-problem-statement.md
-│   ├── 02-requirements.md
-│   ├── 03-architecture.md
-│   ├── 04-evaluation-criteria.md
-│   ├── 05-design-decisions.md
-│   ├── 06-scaling-strategy.md
-│   ├── 07-future-improvements.md
-│   └── glossary.md
+│   ├── tech/                 # Technical Module Documentation
+│   │   ├── module-metric-relevance.md
+│   │   ├── module-metric-completeness.md
+│   │   ├── module-metric-hallucination.md
+│   │   └── ...
 │
 ├── src/
 │   ├── pipeline/
-│   │   ├── relevance.py
-│   │   ├── completeness.py
-│   │   ├── hallucination.py
+│   │   ├── model.py          # Shared Spacy Model Loader
+│   │   ├── relevance.py      # Vector & Intent Scoring
+│   │   ├── completeness.py   # Semantic Coverage & Slots
+│   │   ├── hallucination.py  # Claim Verification
 │   │   ├── latency_cost.py
-│   │   └── evaluation.py
-│   └── main.py
+│   │   └── evaluation.py     # Orchestrator & Verdict Logic
+│   └── api.py                # FastAPI Server
 │
-├── samples/
-│   ├── sample-chat-1.json
-│   ├── sample-chat-2.json
-│   ├── sample-context-1.json
-│   └── sample-context-2.json
+├── frontend/                 # React Dashboard
 │
-├── requirements.txt
-└── README.md
-
+└── requirements.txt
 ```
 
 ---
@@ -98,30 +85,29 @@ llm-eval-pipeline/
 ## 🧠 How It Works
 
 ### 1️⃣ Input  
-The pipeline accepts two JSON files:
-
-- **Conversation JSON** → Extracts last user message + assistant response  
-- **Context Vectors JSON** → Retrieved chunks from a vector database
+The pipeline accepts a JSON payload:
+- **Query**
+- **Response**
+- **Context** (List of retrieved document strings)
 
 ### 2️⃣ Evaluation Core  
-Each module computes an independent score:
+Each module computes an independent score using **Deep Semantics**:
 
-| Module | Purpose |
-|--------|---------|
-| Relevance | semantic similarity to user intent + context alignment |
-| Completeness | keyword + sub-question + context usage coverage |
-| Hallucination | **Claim Verification**: `unsupported_claims / total_claims`. (0.0=Perfect, >0.6=High Risk) |
-| Latency/Cost | runtime + token estimate |
+| Module | Methodology | Scoring Logic |
+|--------|-------------|---------------|
+| **Relevance** | **Intent-Entity Alignment** + **Vector Cosine Similarity** | Intent Match (0.85) > Vector Sim > Lemma Jaccard. |
+| **Completeness** | **Semantic Coverage** + **Intent Slots** | Vectors capture "meaning" even if keywords miss. Bonuses for conversational follow-ups. |
+| **Hallucination** | **Fact Verification** (NER) | Extracts Claims (Dates, Money, SVO). Verifies against context. Score = Weighted Error Rate. |
+| **Latency/Cost** | **Mandated Checks** | **WARN** if > 2000ms or > $0.05. |
 
-### 3️⃣ Aggregation  
+### 3️⃣ Verdict Logic
 Scores → combined into a final **verdict**:
-- `is_relevant`
-- `is_complete_enough`
-- `potentially_hallucinating`
-- `confidence_score`
+- **FAIL**: High Hallucination (>0.5) or Irrelevance (<0.05).
+- **WARN**: Moderate Hallucination, Incomplete, High Latency, or High Cost.
+- **PASS**: All checks clear.
 
 ### 4️⃣ Output  
-A structured JSON report like:
+A structured JSON report.
 
 ```
 

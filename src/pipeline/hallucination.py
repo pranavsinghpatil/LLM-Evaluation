@@ -7,14 +7,8 @@ from typing import List, Set
 import nltk
 from nltk.util import ngrams
 
-# Load Spacy model (lightweight English model)
-try:
-    nlp = spacy.load("en_core_web_sm")
-except OSError:
-    # Fallback if model isn't downloaded yet (shouldn't happen if setup run)
-    import subprocess
-    subprocess.run(["python", "-m", "spacy", "download", "en_core_web_sm"])
-    nlp = spacy.load("en_core_web_sm")
+# Load Spacy model (Medium model used for vectors)
+from .model import nlp
 
 class HallucinationEvaluator:
     """

@@ -400,8 +400,8 @@ function App() {
                         key={mode}
                         onClick={() => setInputMode(mode)}
                         className={`px-4 py-1.5 rounded-md text-xs font-medium transition-all duration-300 capitalize ${inputMode === mode
-                            ? "bg-slate-700 text-white shadow-sm ring-1 ring-white/10"
-                            : "text-slate-400 hover:text-slate-200"
+                          ? "bg-slate-700 text-white shadow-sm ring-1 ring-white/10"
+                          : "text-slate-400 hover:text-slate-200"
                           }`}
                       >
                         {mode}
@@ -442,8 +442,8 @@ function App() {
                           <button
                             onClick={() => setEvalStrategy("smart")}
                             className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium border transition-all ${evalStrategy === "smart"
-                                ? "bg-blue-500/10 border-blue-500/50 text-blue-400"
-                                : "bg-slate-800/50 border-transparent text-slate-400 hover:border-slate-600"
+                              ? "bg-blue-500/10 border-blue-500/50 text-blue-400"
+                              : "bg-slate-800/50 border-transparent text-slate-400 hover:border-slate-600"
                               }`}
                           >
                             <Zap className="w-3 h-3" /> Smart
@@ -451,8 +451,8 @@ function App() {
                           <button
                             onClick={() => setEvalStrategy("overall")}
                             className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium border transition-all ${evalStrategy === "overall"
-                                ? "bg-purple-500/10 border-purple-500/50 text-purple-400"
-                                : "bg-slate-800/50 border-transparent text-slate-400 hover:border-slate-600"
+                              ? "bg-purple-500/10 border-purple-500/50 text-purple-400"
+                              : "bg-slate-800/50 border-transparent text-slate-400 hover:border-slate-600"
                               }`}
                           >
                             <FileText className="w-3 h-3" /> Overall
@@ -490,8 +490,8 @@ function App() {
                                         {turn.role[0]}
                                       </div>
                                       <div className={`p-3 rounded-2xl text-xs max-w-[85%] leading-relaxed ${turn.role === 'User'
-                                          ? 'bg-blue-600/20 text-blue-100 rounded-tr-none'
-                                          : 'bg-slate-800 text-slate-300 rounded-tl-none'
+                                        ? 'bg-blue-600/20 text-blue-100 rounded-tr-none'
+                                        : 'bg-slate-800 text-slate-300 rounded-tl-none'
                                         }`}>
                                         {turn.message}
                                       </div>
@@ -559,8 +559,8 @@ function App() {
                       onClick={handleEvaluate}
                       disabled={loading || !query || !response}
                       className={`w-full py-4 rounded-xl font-bold text-sm tracking-wide transition-all duration-300 transform active:scale-[0.99] flex items-center justify-center gap-3 ${loading || !query || !response
-                          ? "bg-slate-800 text-slate-500 cursor-not-allowed"
-                          : "bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white shadow-xl shadow-blue-900/20"
+                        ? "bg-slate-800 text-slate-500 cursor-not-allowed"
+                        : "bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white shadow-xl shadow-blue-900/20"
                         }`}
                     >
                       {loading ? (
@@ -608,8 +608,8 @@ function App() {
                 <div className="space-y-6 animate-fade-in">
                   {/* Verdict Banner */}
                   <div className={`relative overflow-hidden rounded-2xl p-6 border ${result.verdict.status === 'PASS'
-                      ? 'bg-green-500/10 border-green-500/20'
-                      : 'bg-red-500/10 border-red-500/20'
+                    ? 'bg-green-500/10 border-green-500/20'
+                    : 'bg-red-500/10 border-red-500/20'
                     }`}>
                     <div className="flex justify-between items-start mb-4 relative z-10">
                       <div>
@@ -622,8 +622,8 @@ function App() {
                         <p className="text-xs text-slate-400 font-mono">Latency: {result.metrics.latency_ms.toFixed(0)}ms</p>
                       </div>
                       <div className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border ${result.verdict.status === 'PASS'
-                          ? 'bg-green-500/20 border-green-500/30 text-green-300'
-                          : 'bg-red-500/20 border-red-500/30 text-red-300'
+                        ? 'bg-green-500/20 border-green-500/30 text-green-300'
+                        : 'bg-red-500/20 border-red-500/30 text-red-300'
                         }`}>
                         Verdict
                       </div>

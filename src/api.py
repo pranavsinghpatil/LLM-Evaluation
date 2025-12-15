@@ -61,7 +61,7 @@ async def evaluate_response(request: EvalRequest):
 
 @app.get("/health")
 async def health_check():
-    return {"status": "healthy", "model": "en_core_web_sm"}
+    return {"status": "healthy", "model": "en_core_web_md"}
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)

@@ -60,6 +60,18 @@ class Pipeline:
             verdict = "WARN"
             reasons.append("Incomplete answer")
 
+        # Mandated Cost & Latency Checks
+        MAX_LATENCY_MS = 2000.0
+        MAX_COST_USD = 0.05
+        
+        if latency_ms > MAX_LATENCY_MS:
+            if verdict == "PASS": verdict = "WARN"
+            reasons.append(f"Latency > {int(MAX_LATENCY_MS)}ms")
+            
+        if cost_usd > MAX_COST_USD:
+            if verdict == "PASS": verdict = "WARN"
+            reasons.append("Cost limit exceeded")
+
         return {
             "metrics": {
                 "relevance": round(relevance_score, 4),
